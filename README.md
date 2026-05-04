@@ -34,6 +34,14 @@
 > 完美打磨怪？AI 工具狂？还是 All in 永动机？
 > 你以为的你，和真实的你，往往差很远。
 
+<div align="center">
+
+| 首页 | 结果页 |
+|:---:|:---:|
+| <img src="docs/images/01-home.png" width="220" alt="首页" /> | <img src="docs/images/02-result.png" width="220" alt="结果页" /> |
+
+</div>
+
 ## 📑 目录
 
 - [12 种型人格](#-12-种型人格)
