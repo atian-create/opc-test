@@ -5,8 +5,10 @@ import { getPersonality } from "@/lib/personalities"
 import { IPMascot } from "@/components/ip-mascot"
 import { PersonalityAvatar } from "@/components/personality-avatar"
 import { XHS_PROFILE_URL } from "@/lib/notes"
+import { SITE_DOMAIN, SITE_URL } from "@/lib/site"
 import { Share2, Copy, Loader2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import QRCode from "qrcode"
 
 // clipboard 状态：'idle' 待复制 | 'success' 复制成功 | 'manual' 自动复制失败需手动
 type CopyStatus = "idle" | "success" | "manual"
@@ -31,10 +33,23 @@ export default function ShareClient({ type }: { type: string }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [shareImg, setShareImg] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
 
   useEffect(() => {
     setPageUrl(window.location.origin + `/result/${personality.code}`)
   }, [personality.code])
+
+  // 生成站点首页二维码（data URL，避开跨域 + 让 html2canvas 能直接拍到）
+  // 指向首页而非结果页：分享图作为裂变入口，朋友扫码自己测
+  useEffect(() => {
+    QRCode.toDataURL(SITE_URL, {
+      margin: 1,
+      width: 240,
+      color: { dark: "#2D2D2D", light: "#FFFFFF" },
+    })
+      .then(setQrDataUrl)
+      .catch((e) => console.error("生成二维码失败", e))
+  }, [])
 
   // 生成分享图：桌面直接下载，移动端塞回页面让用户长按保存。
   // iOS Safari/微信 X5 经常忽略 <a download>，必须分两条路径。
@@ -91,6 +106,15 @@ export default function ShareClient({ type }: { type: string }) {
           doc.querySelectorAll<HTMLElement>("[data-pill-label]").forEach((label) => {
             label.style.color = "transparent"
             label.style.textShadow = "none"
+          })
+
+          // 截图专属：隐藏页面 slogan、显示 QR 区。data URL 的 img 即使父级原本
+          // display:none 也已 decode 完成，image-load 等待逻辑能正常通过。
+          doc.querySelectorAll<HTMLElement>("[data-share-page-only]").forEach((el) => {
+            el.style.display = "none"
+          })
+          doc.querySelectorAll<HTMLElement>("[data-share-image-only]").forEach((el) => {
+            el.style.display = "flex"
           })
         },
       })
@@ -231,8 +255,36 @@ export default function ShareClient({ type }: { type: string }) {
                 </span>
               ))}
             </div>
-            <div className="text-xs text-ink/60 pt-4 border-t border-ink/10">
-              一人公司型人格测评 · opc.atian.vip
+            {/* 页面常态：仅一行 slogan。截图时 onclone 会把它隐藏。 */}
+            <div
+              data-share-page-only
+              className="text-xs text-ink/60 pt-4 border-t border-ink/10"
+            >
+              一人公司型人格测评 · {SITE_DOMAIN}
+            </div>
+
+            {/* 仅截图显示：QR + 域名。default display:none，html2canvas onclone 切回 flex。 */}
+            <div
+              data-share-image-only
+              style={{ display: "none" }}
+              className="items-center justify-center gap-3 pt-4 border-t border-ink/10"
+            >
+              {qrDataUrl ? (
+                <img
+                  src={qrDataUrl}
+                  alt={`${SITE_DOMAIN} 二维码`}
+                  width={72}
+                  height={72}
+                  className="rounded-lg bg-white p-1 shadow-sm"
+                />
+              ) : (
+                <div className="w-[72px] h-[72px] rounded-lg bg-white/60" />
+              )}
+              <div className="text-left leading-tight">
+                <div className="text-[11px] text-ink/60">扫码也来测一下 👇</div>
+                <div className="text-sm font-bold text-ink">{SITE_DOMAIN}</div>
+                <div className="text-[10px] text-ink/50 mt-0.5">一人公司型人格测评</div>
+              </div>
             </div>
           </div>
         </div>

@@ -1,14 +1,6 @@
 {
-  "name": "opc-test",
+  "name": "atian-personality-test",
   "version": "0.1.0",
-  "description": "16 道题 · 12 种「一人公司型人格」· 3 分钟看清自己适合哪种 solo 路径",
-  "homepage": "https://opc.atian.vip/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/atian-create/opc-test.git"
-  },
-  "license": "MIT",
-  "author": "Atian",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,14 +8,16 @@
     "start": "next start"
   },
   "dependencies": {
+    "@types/qrcode": "^1.5.6",
+    "clsx": "^2.1.1",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.468.0",
     "next": "15.1.0",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "zustand": "^5.0.2",
-    "lucide-react": "^0.468.0",
-    "html2canvas": "^1.4.1",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.5"
+    "tailwind-merge": "^2.5.5",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@types/node": "^22",
